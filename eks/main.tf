@@ -1,12 +1,14 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
+# AWS provider, configured for the us-east-2 region
 provider "aws" {
   region = "us-east-2"
 }
 
 data "aws_availability_zones" "available" {}
 
+# random string (random_string.suffix) to ensure the creation of uniquely named resources
 locals {
   cluster_name = "education-eks-${random_string.suffix.result}"
 }
@@ -16,6 +18,7 @@ resource "random_string" "suffix" {
   special = false
 }
 
+# to provision a VPC, NAT and Internet gateways, and public and private subnets
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.1"
@@ -45,7 +48,7 @@ module "vpc" {
   }
 }
 
-
+# to provision an EKS cluster and worker nodes within the VPC created by module.vpc
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.15.3"
